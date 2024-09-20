@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Флипбук из PDF</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.0/turn.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/turn.js/4.1.0/turn.min.js"></script>
+    <style>
+        #flipbook {
+            width: 600px;
+            height: 400px;
+            margin: auto;
+            position: relative;
+        }
+        .page {
+            width: 600px;
+            height: 400px;
+            background: white;
+            border: 1px solid #ccc;
+            position: absolute;
+        }
+    </style>
+</head>
+<body>
+    <div id="flipbook"></div>
+
+    <script>
+        const pdfUrl = 'https://github.com/daryalaaa/f/raw/main/0102_gilmore_book.pdf;
+        const flipbook = document.getElementById('flipbook');
+
+        pdfjsLib.getDocument(pdfUrl).promise.then(pdf => {
+            const numPages = pdf.numPages;
+
+            for (let i = 1; i <= numPages; i++) {
+                pdf.getPage(i).then(page => {
+                    const viewport = page.getViewport({ scale: 1 });
+                    const canvas = document.createElement('canvas');
+                    canvas.className = 'page';
+                    canvas.width = viewport.width;
+                    canvas.height = viewport.height;
+
+                    const context = canvas.getContext('2d');
+                    const renderContext = {
+                        canvasContext: context,
+                        viewport: viewport,
+                    };
+
+                    page.render(renderContext).promise.then(() => {
+                        flipbook.appendChild(canvas);
+                        if (i === numPages) {
+                            $(flipbook).turn({
+                                width: 600,
+                                height: 400,
+                                autoCenter: true,
+                            });
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+</body>
+</html>
